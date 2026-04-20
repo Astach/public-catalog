@@ -1,0 +1,78 @@
+apiVersion: "qovery.com/v2"
+kind: StackBlueprint
+
+metadata:
+  name: "data-platform-stack"
+  version: "1.0.0"
+  description: "S3 bucket + RDS PostgreSQL + Qovery nginx container"
+  icon: "https://cdn.qovery.com/icons/stack.svg"
+  categories:
+    - "stack"
+    - "platform"
+
+spec:
+  sharedVariables:
+    - name: "aws_region"
+      type: "string"
+      required: true
+      description: "AWS region for all infrastructure services"
+    - name: "environment_name"
+      type: "string"
+      required: true
+      description: "Logical name used to tag and identify all resources"
+
+  stages:
+    - name: "infrastructure"
+      description: "Provision S3 bucket and RDS PostgreSQL database"
+      services:
+        - blueprint: "aws-s3"
+          url: "https://github.com/Astach/public-catalog.git"
+          version: "1.0.0"
+          name: "data-bucket"
+          variables:
+            - name: "bucket_name"
+              description: "S3 bucket name (must be globally unique)"
+              required: true
+            - name: "versioning"
+              default: "true"
+            - name: "encryption"
+              default: "true"
+            - name: "force_destroy"
+              default: "true"
+
+        - blueprint: "aws-rds-postgresql"
+          url: "https://github.com/Astach/public-catalog.git"
+          version: "1.0.0"
+          name: "main-db"
+          variables:
+            - name: "db_name"
+              description: "Database name"
+              required: true
+            - name: "db_username"
+              description: "Master username"
+              required: true
+            - name: "db_password"
+              description: "Master password"
+              required: true
+            - name: "instance_class"
+              default: "db.t3.micro"
+            - name: "allocated_storage"
+              default: "20"
+
+    - name: "application"
+      description: "Deploy nginx container on Qovery"
+      services:
+        - blueprint: "qovery-container"
+          url: "https://github.com/Astach/public-catalog.git"
+          version: "1.0.0"
+          name: "web-server"
+          variables:
+            - name: "container_name"
+              description: "Container service name"
+              required: true
+            - name: "image_name"
+              default: "nginx"
+            - name: "image_tag"
+              default: "1.27-alpine"
+            - name: "port"
+              default: "80"

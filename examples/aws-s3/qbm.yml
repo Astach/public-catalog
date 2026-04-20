@@ -6,6 +6,7 @@ metadata:
   version: "1.0.0"
   description: "S3 bucket with encryption, versioning, and lifecycle rules"
   icon: "https://cdn.qovery.com/icons/s3.svg"
+  serviceFamily: "s3"
   categories:
     - "storage"
     - "s3"
@@ -23,7 +24,7 @@ spec:
     cpu: "500m"
     ram: "512Mi"
 
-  qoveryVariables:
+  contextVariables:
     - name: "region"
       source: "cluster.region"
       overridable: true
@@ -31,7 +32,7 @@ spec:
       source: "cluster.name"
       overridable: false
 
-  userVariables:
+  variables:
     - name: "bucket_name"
       type: "string"
       required: true

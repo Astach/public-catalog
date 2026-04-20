@@ -6,6 +6,8 @@ metadata:
   version: "1.0.0"
   description: "Redis cache via Bitnami Helm chart"
   icon: "https://cdn.qovery.com/icons/redis.svg"
+  serviceFamily: "redis"
+  serviceVersionVar: "redis_version"
   categories:
     - "cache"
     - "redis"
@@ -16,17 +18,22 @@ spec:
   chart:
     repository: "https://charts.bitnami.com/bitnami"
     name: "redis"
-    version: "19.0.2"
+    version: "25.3.11"
 
-  # Helm platform settings — blueprint author controls, end user never sees
   arguments: []
   allowClusterWideResources: false
 
-  qoveryVariables:
+  contextVariables:
     - name: "namespace"
       source: "cluster.namespace"
 
-  userVariables:
+  variables:
+    - name: "redis_version"
+      type: "string"
+      required: false
+      default: "7.4"
+      description: "Redis version"
+      validValues: ["7.2", "7.4"]
     - name: "replica_count"
       type: "number"
       required: false

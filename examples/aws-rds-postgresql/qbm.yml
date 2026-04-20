@@ -1,0 +1,84 @@
+apiVersion: "qovery.com/v2"
+kind: ServiceBlueprint
+
+metadata:
+  name: "aws-rds-postgresql"
+  version: "1.0.0"
+  description: "AWS RDS PostgreSQL instance with configurable size and storage"
+  icon: "https://cdn.qovery.com/icons/postgresql.svg"
+  serviceFamily: "postgresql"
+  serviceVersionVar: "engine_version"
+  categories:
+    - "database"
+    - "postgresql"
+    - "rds"
+
+spec:
+  engine: terraform
+  provider: aws
+
+  credentials:
+    default: cluster
+    overridable: false
+
+  timeout: 3600
+  resources:
+    cpu: "500m"
+    ram: "512Mi"
+
+  contextVariables:
+    - name: "region"
+      source: "cluster.region"
+      overridable: true
+    - name: "qovery_cluster_name"
+      source: "cluster.name"
+      overridable: false
+
+  variables:
+    - name: "db_name"
+      type: "string"
+      required: true
+      description: "Database name"
+    - name: "db_username"
+      type: "string"
+      required: true
+      description: "Master username"
+    - name: "db_password"
+      type: "string"
+      required: true
+      description: "Master password (min 8 characters)"
+    - name: "instance_class"
+      type: "string"
+      required: false
+      default: "db.t3.micro"
+      description: "RDS instance class"
+    - name: "allocated_storage"
+      type: "number"
+      required: false
+      default: "20"
+      description: "Allocated storage in GiB"
+    - name: "engine_version"
+      type: "string"
+      required: false
+      default: "16"
+      description: "PostgreSQL major version"
+      validValues: ["14", "15", "16", "17"]
+    - name: "multi_az"
+      type: "bool"
+      required: false
+      default: "false"
+      description: "Enable Multi-AZ deployment"
+
+  outputs:
+    - name: "db_endpoint"
+      description: "RDS instance endpoint (host:port)"
+      sensitive: false
+    - name: "db_address"
+      description: "RDS instance hostname"
+      sensitive: false
+    - name: "db_port"
+      description: "RDS instance port"
+      sensitive: false
+    - name: "db_name"
+      description: "Database name"
+      sensitive: false

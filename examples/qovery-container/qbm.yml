@@ -1,0 +1,71 @@
+apiVersion: "qovery.com/v2"
+kind: ServiceBlueprint
+
+metadata:
+  name: "qovery-container"
+  version: "1.0.0"
+  description: "Deploy a container on Qovery (nginx example)"
+  icon: "https://cdn.qovery.com/icons/container.svg"
+  serviceFamily: "container"
+  categories:
+    - "application"
+    - "container"
+
+spec:
+  engine: terraform
+  provider: qovery
+
+  credentials:
+    default: cluster
+    overridable: false
+
+  timeout: 600
+
+  contextVariables:
+    - name: "qovery_organization_id"
+      source: "organization.id"
+    - name: "qovery_project_id"
+      source: "project.id"
+    - name: "qovery_environment_id"
+      source: "environment.id"
+    - name: "qovery_cluster_id"
+      source: "cluster.id"
+
+  variables:
+    - name: "container_name"
+      type: "string"
+      required: true
+      description: "Name of the container service"
+    - name: "image_name"
+      type: "string"
+      required: false
+      default: "nginx"
+      description: "Docker image name"
+    - name: "image_tag"
+      type: "string"
+      required: false
+      default: "1.27-alpine"
+      description: "Docker image tag (must not be 'latest')"
+    - name: "cpu"
+      type: "number"
+      required: false
+      default: "250"
+      description: "CPU in millicores"
+    - name: "memory"
+      type: "number"
+      required: false
+      default: "256"
+      description: "Memory in MiB"
+    - name: "port"
+      type: "number"
+      required: false
+      default: "80"
+      description: "Container port to expose"
+
+  outputs:
+    - name: "container_id"
+      description: "Qovery container service ID"
+      sensitive: false
+    - name: "container_name"
+      description: "Container service name"
+      sensitive: false
