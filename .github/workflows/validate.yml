@@ -1,0 +1,128 @@
+name: Validate Blueprints
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate-qbm:
+    name: Validate QBM manifests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install tools
+        run: pip install pyyaml
+
+      - name: Validate QBM structure
+        run: |
+          for qbm in $(find examples -name 'qbm.yml' -type f); do
+            echo "Validating $qbm..."
+
+            python3 -c "
+          import yaml, sys
+
+          with open('$qbm') as f:
+              doc = yaml.safe_load(f)
+
+          errors = []
+
+          # Required top-level fields
+          for field in ['apiVersion', 'kind', 'metadata', 'spec']:
+              if field not in doc:
+                  errors.append(f'Missing required field: {field}')
+
+          if errors:
+              for e in errors:
+                  print(f'ERROR: {e}')
+              sys.exit(1)
+
+          meta = doc.get('metadata', {})
+          for field in ['name', 'version']:
+              if field not in meta:
+                  errors.append(f'Missing metadata.{field}')
+
+          spec = doc.get('spec', {})
+          engine = spec.get('engine')
+          if engine not in ('terraform', 'opentofu', 'helm'):
+              errors.append(f'spec.engine must be terraform, opentofu, or helm (got: {engine})')
+
+          if engine in ('terraform', 'opentofu') and 'provider' not in spec:
+              errors.append(f'spec.provider is required when engine is {engine}')
+
+          if engine == 'helm' and 'chart' not in spec:
+              errors.append('spec.chart is required when engine is helm')
+
+          if errors:
+              for e in errors:
+                  print(f'ERROR: {e}')
+              sys.exit(1)
+
+          print(f'OK: $qbm')
+          "
+          done
+
+      - name: Validate variables exist in TF files (terraform blueprints)
+        run: |
+          for qbm in $(find examples -name 'qbm.yml' -type f); do
+            dir=$(dirname "$qbm")
+
+            python3 -c "
+          import yaml, re, sys, glob
+
+          with open('$qbm') as f:
+              doc = yaml.safe_load(f)
+
+          engine = doc.get('spec', {}).get('engine')
+          if engine not in ('terraform', 'opentofu'):
+              print(f'SKIP: $qbm (engine={engine}, not terraform)')
+              sys.exit(0)
+
+          # Check variables.tf exists
+          vars_file = '$dir/variables.tf'
+          try:
+              with open(vars_file) as f:
+                  tf_content = f.read()
+          except FileNotFoundError:
+              print(f'ERROR: {vars_file} not found')
+              sys.exit(1)
+
+          tf_vars = set(re.findall(r'variable\s+\"(\w+)\"', tf_content))
+
+          errors = []
+          for var in doc['spec'].get('qoveryVariables', []):
+              if var['name'] not in tf_vars:
+                  errors.append(f\"qoveryVariable '{var['name']}' not found in {vars_file}\")
+
+          for var in doc['spec'].get('userVariables', []):
+              if var['name'] not in tf_vars:
+                  errors.append(f\"userVariable '{var['name']}' not found in {vars_file}\")
+
+          if errors:
+              for e in errors:
+                  print(f'ERROR: {e}')
+              sys.exit(1)
+
+          print(f'OK: All variables in $qbm exist in {vars_file}')
+          "
+          done
+
+  validate-terraform:
+    name: Validate Terraform
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        blueprint:
+          - examples/aws-s3
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9"
+
+      - name: Terraform init & validate
+        working-directory: ${{ matrix.blueprint }}
+        run: |
+          terraform init -backend=false
+          terraform validate
