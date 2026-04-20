@@ -16,7 +16,7 @@ spec:
   chart:
     repository: "https://charts.bitnami.com/bitnami"
     name: "redis"
-    version: "19.x"
+    version: "19.0.2"
 
   # Helm platform settings — blueprint author controls, end user never sees
   arguments: []
