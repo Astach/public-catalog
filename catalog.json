@@ -1,81 +1,65 @@
 {
   "version": "2",
-  "generatedAt": "2026-04-21T15:00:10Z",
+  "generatedAt": "2026-04-29T10:00:00Z",
   "blueprints": [
-    {
-      "name": "aws-rds-postgresql",
-      "kind": "ServiceBlueprint",
-      "description": "AWS RDS PostgreSQL instance with configurable size and storage",
-      "icon": "https://cdn.qovery.com/icons/postgresql.svg",
-      "categories": [
-        "database",
-        "postgresql",
-        "rds"
-      ],
-      "provider": "aws",
-      "serviceFamily": "postgresql",
-      "path": "examples/aws-rds-postgresql",
-      "supportedServiceVersions": ["14", "15", "16", "17"],
-      "versions": []
-    },
     {
       "name": "aws-s3",
       "kind": "ServiceBlueprint",
       "description": "S3 bucket with encryption, versioning, and lifecycle rules",
       "icon": "https://cdn.qovery.com/icons/s3.svg",
-      "categories": [
-        "storage",
-        "s3"
-      ],
+      "categories": ["storage", "s3"],
       "provider": "aws",
       "serviceFamily": "s3",
-      "path": "examples/aws-s3",
-      "supportedServiceVersions": [],
-      "versions": []
+      "majorVersions": [
+        { "serviceVersion": "1", "latestTag": null }
+      ]
     },
     {
-      "name": "data-platform-stack",
-      "kind": "StackBlueprint",
-      "description": "S3 bucket + RDS PostgreSQL + Qovery nginx container",
-      "icon": "https://cdn.qovery.com/icons/stack.svg",
-      "categories": [
-        "stack",
-        "platform"
-      ],
-      "provider": "data-platform-stack",
-      "path": "examples/data-platform-stack",
-      "supportedServiceVersions": [],
-      "versions": []
+      "name": "aws-postgres",
+      "kind": "ServiceBlueprint",
+      "description": "AWS RDS PostgreSQL instance with configurable size and storage",
+      "icon": "https://cdn.qovery.com/icons/postgresql.svg",
+      "categories": ["database", "postgresql", "rds"],
+      "provider": "aws",
+      "serviceFamily": "postgres",
+      "majorVersions": [
+        { "serviceVersion": "16", "latestTag": null }
+      ]
     },
     {
       "name": "helm-redis",
       "kind": "ServiceBlueprint",
       "description": "Redis cache via Bitnami Helm chart",
       "icon": "https://cdn.qovery.com/icons/redis.svg",
-      "categories": [
-        "cache",
-        "redis"
-      ],
+      "categories": ["cache", "redis"],
       "provider": "helm",
       "serviceFamily": "redis",
-      "path": "examples/helm-redis",
-      "supportedServiceVersions": ["7.2", "7.4"],
-      "versions": []
+      "majorVersions": [
+        { "serviceVersion": "7", "latestTag": null }
+      ]
     },
     {
       "name": "qovery-container",
       "kind": "ServiceBlueprint",
       "description": "Deploy a container on Qovery (nginx example)",
       "icon": "https://cdn.qovery.com/icons/container.svg",
-      "categories": [
-        "application",
-        "container"
-      ],
+      "categories": ["application", "container"],
       "provider": "qovery",
       "serviceFamily": "container",
-      "path": "examples/qovery-container",
-      "supportedServiceVersions": [],
-      "versions": []
+      "majorVersions": [
+        { "serviceVersion": "1", "latestTag": null }
+      ]
+    },
+    {
+      "name": "data-platform-stack",
+      "kind": "StackBlueprint",
+      "description": "S3 bucket + RDS PostgreSQL + Qovery nginx container",
+      "icon": "https://cdn.qovery.com/icons/stack.svg",
+      "categories": ["stack", "platform"],
+      "provider": "stacks",
+      "majorVersions": [
+        { "serviceVersion": "1", "latestTag": null }
+      ]
     }
   ]
 }

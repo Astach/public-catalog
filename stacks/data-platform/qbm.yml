@@ -25,7 +25,7 @@ spec:
     - name: "infrastructure"
       description: "Provision S3 bucket and RDS PostgreSQL database"
       services:
-        - blueprint: "aws-s3"
+        - blueprint: "aws/s3/1"
           url: "https://github.com/Astach/public-catalog.git"
           version: "1.0.0"
           name: "data-bucket"
@@ -40,7 +40,7 @@ spec:
             - name: "force_destroy"
               default: "true"
 
-        - blueprint: "aws-rds-postgresql"
+        - blueprint: "aws/postgres/16"
           url: "https://github.com/Astach/public-catalog.git"
           version: "1.0.0"
           name: "main-db"
@@ -62,7 +62,7 @@ spec:
     - name: "application"
       description: "Deploy nginx container on Qovery"
       services:
-        - blueprint: "qovery-container"
+        - blueprint: "qovery/container/1"
           url: "https://github.com/Astach/public-catalog.git"
           version: "1.0.0"
           name: "web-server"

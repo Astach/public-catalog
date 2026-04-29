@@ -5,7 +5,6 @@ on:
     branches: [main]
   push:
     branches: [main]
-    tags: ["**/[0-9]*.[0-9]*.[0-9]*"]   # e.g. aws/s3/1.0.0
 
 jobs:
   validate-qbm:
@@ -21,7 +20,11 @@ jobs:
 
       - name: Validate QBM structure
         run: |
-          for qbm in $(find examples -name 'qbm.yml' -type f); do
+          for qbm in $(find . -name 'qbm.yml' -type f \
+            -not -path './.git/*' \
+            -not -path './.github/*' \
+            -not -path './tools/*' \
+            -not -path './scripts/*'); do
             echo "Validating $qbm..."
 
             python3 -c "
@@ -65,24 +68,6 @@ jobs:
               if engine == 'helm' and 'chart' not in spec:
                   errors.append('spec.chart is required when engine is helm')
 
-          # Validate validValues on variables
-          all_vars = spec.get('variables', []) or []
-          var_names = [v['name'] for v in all_vars]
-
-          for var in all_vars:
-              vv = var.get('validValues')
-              if vv is not None:
-                  if not isinstance(vv, list):
-                      errors.append(f\"Variable '{var['name']}' validValues must be a list\")
-                  elif 'default' in var and var['default'] not in vv:
-                      errors.append(f\"Variable '{var['name']}' default '{var['default']}' is not in validValues {vv}\")
-
-          # Validate serviceVersionVar points to an actual variable
-          svv = meta.get('serviceVersionVar')
-          if svv is not None:
-              if svv not in var_names:
-                  errors.append(f\"metadata.serviceVersionVar '{svv}' does not match any variable in spec.variables (found: {var_names})\")
-
           if errors:
               for e in errors:
                   print(f'ERROR: {e}')
@@ -94,7 +79,11 @@ jobs:
 
       - name: Validate variables exist in TF files (terraform blueprints)
         run: |
-          for qbm in $(find examples -name 'qbm.yml' -type f); do
+          for qbm in $(find . -name 'qbm.yml' -type f \
+            -not -path './.git/*' \
+            -not -path './.github/*' \
+            -not -path './tools/*' \
+            -not -path './scripts/*'); do
             dir=$(dirname "$qbm")
 
             python3 -c "
@@ -143,9 +132,9 @@ jobs:
     strategy:
       matrix:
         blueprint:
-          - examples/aws-s3
-          - examples/aws-rds-postgresql
-          - examples/qovery-container
+          - aws/s3/1
+          - aws/postgres/16
+          - qovery/container/1
     steps:
       - uses: actions/checkout@v4
 

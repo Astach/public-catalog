@@ -6,8 +6,7 @@ metadata:
   version: "1.0.0"
   description: "AWS RDS PostgreSQL instance with configurable size and storage"
   icon: "https://cdn.qovery.com/icons/postgresql.svg"
-  serviceFamily: "postgresql"
-  serviceVersionVar: "engine_version"
+  serviceFamily: "postgres"
   categories:
     - "database"
     - "postgresql"
@@ -62,7 +61,6 @@ spec:
       required: false
       default: "16"
       description: "PostgreSQL major version"
-      validValues: ["14", "15", "16", "17"]
     - name: "multi_az"
       type: "bool"
       required: false

@@ -7,7 +7,6 @@ metadata:
   description: "Redis cache via Bitnami Helm chart"
   icon: "https://cdn.qovery.com/icons/redis.svg"
   serviceFamily: "redis"
-  serviceVersionVar: "redis_version"
   categories:
     - "cache"
     - "redis"
@@ -28,12 +27,6 @@ spec:
       source: "cluster.namespace"
 
   variables:
-    - name: "redis_version"
-      type: "string"
-      required: false
-      default: "7.4"
-      description: "Redis version"
-      validValues: ["7.2", "7.4"]
     - name: "replica_count"
       type: "number"
       required: false
